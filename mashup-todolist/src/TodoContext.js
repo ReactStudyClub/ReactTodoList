@@ -1,4 +1,4 @@
-import React, { useReducer,createContext } from 'react'
+import React, { useReducer,createContext, useContext, useRef} from 'react'
 
 const initialTodos = [
    {
@@ -14,12 +14,12 @@ const initialTodos = [
    {
       id: 3,
       text: 'Context 만들기',
-      done: true
+      done: false
    },
    {
       id: 4,
       text: '기능 구현하기',
-      done: true
+      done: false
    },
 ];
 
@@ -41,14 +41,46 @@ function todoReducer(state, action) {
 
 const TodoStateContext = createContext();
 const TodoDispatchContext = createContext();
+const TodoNextIdContext = createContext();
 
 export function TodoProvider({ children }) {
    const [state, dispatch] = useReducer(todoReducer, initialTodos);
+   const nextId = useRef(5);
+
+
    return (
       <TodoStateContext.Provider value={state}>
       <TodoDispatchContext.Provider value={dispatch}>
+      <TodoNextIdContext.Provider value={nextId}>
         {children}
+        </TodoNextIdContext.Provider>
       </TodoDispatchContext.Provider>
     </TodoStateContext.Provider>
    );
+ }
+
+
+ // 커스텀 hook 과 에러처리 구문
+ export function useTodoState() {
+   const context = useContext(TodoStateContext);
+   if (!context) {
+     throw new Error('Cannot find TodoProvider');
+   }
+   return context;
+ }
+ 
+ export function useTodoDispatch() {
+   const context = useContext(TodoDispatchContext);
+   if (!context) {
+     throw new Error('Cannot find TodoProvider');
+   }
+   return context;
+ }
+ 
+ export function useTodoNextId() {
+   const context = useContext(TodoNextIdContext);
+   if (!context) {
+     throw new Error('Cannot find TodoProvider');
+   }
+   return context;
  }

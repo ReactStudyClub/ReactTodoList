@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useTodoState } from '../TodoContext';
 import TodoItem from './TodoItem';
+
 
 const TodoListBlock = styled.div`
   flex: 1;
@@ -9,13 +11,20 @@ const TodoListBlock = styled.div`
   overflow-y: auto;
 `;
 
-function TodoList() {
+function TodoList() { 
+
+  const todos = useTodoState(); //TodoContext에서 가지고온 커스텀 훅을 todos 변수에 담는다
+
   return (
-    <TodoListBlock>
-      <TodoItem text="프로젝트 생성하기" done={true} />
-      <TodoItem text="컴포넌트 스타일링 하기" done={true} />
-      <TodoItem text="Context 만들기" done={false} />
-      <TodoItem text="기능 구현하기" done={false} />
+    <TodoListBlock> 
+      {todos.map(todo => //todos 변수에 담긴 객체 리스트를 전부 맵함수로 반복하여 TodoItem 생성한다
+      <TodoItem
+      key={todo.id} //고유키는 id로 생성
+      id={todo.id}
+      text={todo.text}
+      done={todo.done}
+      >
+      </TodoItem>)}
     </TodoListBlock>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, {css} from 'styled-components';
 import {MdDone,MdDelete} from 'react-icons/md';
+import { useTodoDispatch } from '../TodoContext';
 
 const Remove = styled.div`
     display:flex;
@@ -59,15 +60,20 @@ const Text=styled.div`
 `;
 
 function TodoItem({id, done, text}){
+
+    const dispatch = useTodoDispatch(); //TodoContext에서 useTodoDispatch를 가져와 변수에 담는다
+
+    const onToggle = () => dispatch({type:'TOGGLE',id}); //디스패치에 타입과, action값:id를 넘겨준다
+    const onRemove = () => dispatch({type:'REMOVE',id}); //디스패치에 타입과, action값:id를 넘겨준다
     return(
         <TodoItemBlock>
-            <CheckCircle done={done}>{done && <MdDone/>}</CheckCircle>
+            <CheckCircle done={done} onClick={onToggle}>{done && <MdDone/>}</CheckCircle>
             <Text done={done}>{text}</Text>
-            <Remove>
+            <Remove onClick={onRemove}>
                 <MdDelete/>
             </Remove>
         </TodoItemBlock>
     );
 }
 
-export default TodoItem;
+export default React.memo(TodoItem);

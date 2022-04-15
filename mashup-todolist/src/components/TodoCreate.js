@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { MdAdd } from 'react-icons/md';
+import { useTodoDispatch, useTodoNextId } from '../TodoContext';
 
 const CircleButton = styled.button`
   background: #38d9a9;
@@ -76,16 +77,40 @@ const Input = styled.input`
 `;
 
 function TodoCreate() {
-  const [open, setOpen] = useState(false);
 
-  const onToggle = () => setOpen(!open);
+  const [open, setOpen] = useState(false); //+버튼 상태값
+  const [value, setValue] = useState('');
 
+  const dispatch = useTodoDispatch(); //  TodoContext에서 가져온 useTodoDispatch 함수를 변수에 담는다.
+  const nextId = useTodoNextId(); // TodoContext에서 가져온 useTodoNextId 함수를 변수에 담는다.
+
+  const onToggle = () => setOpen(!open); //동작시 +버튼 상태값 반전 함수 
+  const onChange = e => setValue(e.target.value);
+  const onSubmit = e => {
+    e.preventDefault(); //새로고침 방지
+
+    dispatch({ //디스패치
+      type:'CREATE',
+      todo: {
+        id: nextId.current,
+        text: value,
+        done: false
+      }
+    });
+
+    setValue('') //입력창 초기화
+    setOpen(false); //입력창 닫기
+    nextId.current += 1; //nextId useref() 값에 1 증가
+  }
   return (
     <>
       {open && (
-        <InsertFormPositioner>
-          <InsertForm>
-            <Input autoFocus placeholder="할 일을 입력 후, Enter 를 누르세요" />
+        <InsertFormPositioner >
+          <InsertForm onSubmit={onSubmit}>
+            <Input autoFocus 
+            placeholder="할 일을 입력 후, Enter 를 누르세요" 
+            onChange={onChange}
+            value={value}/>
           </InsertForm>
         </InsertFormPositioner>
       )}
@@ -96,4 +121,4 @@ function TodoCreate() {
   );
 }
 
-export default TodoCreate;
+export default React.memo(TodoCreate);// React.memo 로 감싸주었는데요, 이렇게 함으로써 TodoContext 에서 관리하고 있는 state 가 바뀔 때 때 TodoCreate 의 불필요한 리렌더링을 방지 할 수 있습니다
